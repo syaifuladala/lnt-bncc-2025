@@ -1,3 +1,3 @@
 ### repository ini berisi kumpulan source code dari LNT yang diselanggarakan oleh Binus Computer Club BNCC
 
-9 Juli 2025 - [Sesi 1: Pengenalan Go](https://github.com/syaifuladala/lnt-bncc-2025/tree/main/Day1)
+10 Juli 2025 - [Sesi 1: Pengenalan Go](https://github.com/syaifuladala/lnt-bncc-2025/tree/main/Day1)
