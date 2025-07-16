@@ -60,16 +60,21 @@ func main() {
 	// Tampilkan data mahasiswa
 	for i, mhs := range mahasiswas {
 		// validasi nomor HP dan nilai
-		if err := utils.CekNoHP(mhs.NoHP); err != nil {
+		err := utils.CekNoHP(mhs.NoHP)
+		if err != nil {
 			panic(fmt.Sprintf("Data mahasiswa %s: %v", mhs.Nama, err))
 		}
-		if err := utils.ValidasiNilai(mhs.Nilai); err != nil {
+
+		err = utils.ValidasiNilai(mhs.Nilai)
+		if err != nil {
 			panic(fmt.Sprintf("Data mahasiswa %s: %v", mhs.Nama, err))
 		}
 
 		// kalkulasi rata-rata nilai dan status kelulusan
 		rata2 := utils.RataRataNilai(mhs.Nilai)
-		mhs.Lulus, mhs.KeteranganLulus = utils.CekStatusKelulusan(rata2)
+		lulus, keteranganLulus := utils.CekStatusKelulusan(rata2)
+		mhs.Lulus = lulus
+		mhs.KeteranganLulus = keteranganLulus
 
 		fmt.Println("===============================")
 		fmt.Printf("Mahasiswa ke-%d\n", i+1)
