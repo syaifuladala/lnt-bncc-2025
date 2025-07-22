@@ -1,19 +1,17 @@
 package models
 
-type Alamat struct {
-	Jalan   string `json:"jalan"`
-	Kota    string `json:"kota"`
-	KodePos string `json:"kode_pos"`
-}
+import "gorm.io/gorm"
 
 type Mahasiswa struct {
-	ID              int      `json:"id"`
-	Nama            string   `json:"nama"`
-	Umur            int      `json:"umur"`
-	Hobi            []string `json:"hobi"`
-	Alamat          Alamat   `json:"alamat"`
-	NoHP            *string  `json:"no_hp"`
-	Nilai           []int    `json:"nilai"`
-	Lulus           bool     `json:"lulus"`
-	KeteranganLulus string   `json:"keterangan_lulus"`
+	gorm.Model
+	Nama     string  `json:"nama"`
+	NIM      string  `json:"nim" gorm:"unique"`
+	Umur     int     `json:"umur"`
+	Hobi     string  `json:"hobi"`
+	Alamat   string  `json:"alamat"`
+	Kota     string  `json:"kota"`
+	KodePos  string  `json:"kode_pos"`
+	NoHP     *string `json:"no_hp"`
+	RataRata float64 `json:"rata_rata"`
+	Lulus    bool    `json:"lulus" gorm:"default:0"`
 }

@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"mahasiswa/models"
+	"mahasiswa/repositories"
 	"mahasiswa/schemas"
 	"mahasiswa/utils"
 	"net/http"
@@ -11,8 +12,6 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-var mahasiswas []models.Mahasiswa
-
 func ListMahasiswa(c *gin.Context) {
 	var request schemas.ListMahasiswaRequest
 	if err := c.ShouldBindQuery(&request); err != nil {
@@ -20,10 +19,15 @@ func ListMahasiswa(c *gin.Context) {
 		return
 	}
 
+	mahasiswas, err := repositories.ListMahasiswa()
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
 	var response []schemas.ListMahasiswaResponse
 	for _, mhs := range mahasiswas {
-		rataRata := utils.RataRataNilai(mhs.Nilai)
-		_, keteranganLulus := utils.CekStatusKelulusan(rataRata)
+		_, keteranganLulus := utils.CekStatusKelulusan(mhs.RataRata)
 
 		if request.Search != nil {
 			if !strings.Contains(mhs.Nama, *request.Search) {
@@ -40,7 +44,7 @@ func ListMahasiswa(c *gin.Context) {
 		response = append(response, schemas.ListMahasiswaResponse{
 			ID:              mhs.ID,
 			Nama:            mhs.Nama,
-			RataRataNilai:   rataRata,
+			RataRataNilai:   mhs.RataRata,
 			KeteranganLulus: keteranganLulus,
 		})
 	}
@@ -64,23 +68,31 @@ func CreateMahasiswa(c *gin.Context) {
 		return
 	}
 	rata2 := utils.RataRataNilai(req.Nilai)
-	lulus, keteranganLulus := utils.CekStatusKelulusan(rata2)
+	lulus, _ := utils.CekStatusKelulusan(rata2)
 
-	id := len(mahasiswas) + 1
-
-	newMahasiswa := models.Mahasiswa{
-		ID:              id,
-		Nama:            req.Nama,
-		Umur:            req.Umur,
-		Hobi:            req.Hobi,
-		NoHP:            req.NoHP,
-		Alamat:          models.Alamat{Jalan: req.Alamat.Jalan, Kota: req.Alamat.Kota, KodePos: req.Alamat.KodePos},
-		Nilai:           req.Nilai,
-		Lulus:           lulus,
-		KeteranganLulus: keteranganLulus,
+	var hobiString string
+	if len(req.Hobi) > 0 {
+		hobiString = strings.Join(req.Hobi, ", ")
 	}
 
-	mahasiswas = append(mahasiswas, newMahasiswa)
+	newMahasiswa := models.Mahasiswa{
+		Nama:     req.Nama,
+		NIM:      req.NIM,
+		Umur:     req.Umur,
+		Hobi:     hobiString,
+		NoHP:     req.NoHP,
+		Alamat:   req.Alamat.Alamat,
+		Kota:     req.Alamat.Kota,
+		KodePos:  req.Alamat.KodePos,
+		Lulus:    lulus,
+		RataRata: rata2,
+	}
+
+	err = repositories.CreateMahasiswa(&newMahasiswa)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
 
 	c.JSON(http.StatusOK, newMahasiswa)
 }
@@ -98,14 +110,13 @@ func GetMahasiswaByID(c *gin.Context) {
 		return
 	}
 
-	for _, mhs := range mahasiswas {
-		if mhs.ID == idInt {
-			c.JSON(http.StatusOK, mhs)
-			return
-		}
+	mahasiswa, err := repositories.GetMahasiswaByID(uint(idInt))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
 	}
 
-	c.JSON(404, gin.H{"error": "Mahasiswa tidak ditemukan"})
+	c.JSON(http.StatusOK, gin.H{"data": mahasiswa})
 }
 
 func UpdateMahasiswa(c *gin.Context) {
@@ -136,26 +147,43 @@ func UpdateMahasiswa(c *gin.Context) {
 	}
 
 	rata2 := utils.RataRataNilai(req.Nilai)
-	lulus, keteranganLulus := utils.CekStatusKelulusan(rata2)
+	lulus, _ := utils.CekStatusKelulusan(rata2)
 
-	for i, mhs := range mahasiswas {
-		if mhs.ID == idInt {
-			mhs.Nama = req.Nama
-			mhs.Umur = req.Umur
-			mhs.Hobi = req.Hobi
-			mhs.NoHP = req.NoHP
-			mhs.Alamat = models.Alamat{Jalan: req.Alamat.Jalan, Kota: req.Alamat.Kota, KodePos: req.Alamat.KodePos}
-			mhs.Nilai = req.Nilai
-			mhs.Lulus = lulus
-			mhs.KeteranganLulus = keteranganLulus
-
-			mahasiswas[i] = mhs
-
-			c.JSON(http.StatusOK, mhs)
-			return
-		}
+	mahasiswa, err := repositories.GetMahasiswaByID(uint(idInt))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
 	}
-	c.JSON(404, gin.H{"error": "Mahasiswa tidak ditemukan"})
+
+	mahasiswa.Nama = req.Nama
+	mahasiswa.NIM = req.NIM
+	mahasiswa.Umur = req.Umur
+
+	var hobiString string
+	if len(req.Hobi) > 0 {
+		hobiString = strings.Join(req.Hobi, ", ")
+	}
+	mahasiswa.Hobi = hobiString
+
+	mahasiswa.NoHP = nil
+	if req.NoHP != nil {
+		mahasiswa.NoHP = req.NoHP
+	}
+
+	mahasiswa.Alamat = req.Alamat.Alamat
+	mahasiswa.Kota = req.Alamat.Kota
+	mahasiswa.KodePos = req.Alamat.KodePos
+
+	mahasiswa.Lulus = lulus
+	mahasiswa.RataRata = rata2
+
+	err = repositories.UpdateMahasiswa(mahasiswa)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, mahasiswa)
 }
 
 func DeleteMahasiswa(c *gin.Context) {
@@ -171,15 +199,11 @@ func DeleteMahasiswa(c *gin.Context) {
 		return
 	}
 
-	for i, mhs := range mahasiswas {
-		if mhs.ID == idInt {
-			before := mahasiswas[:i]  // Elemen sebelum i
-			after := mahasiswas[i+1:] // Elemen setelah i
-			mahasiswas = append(before, after...)
-			c.JSON(http.StatusOK, nil)
-			return
-		}
+	err = repositories.DeleteMahasiswa(uint(idInt))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
 	}
 
-	c.JSON(404, gin.H{"error": "Mahasiswa tidak ditemukan"})
+	c.JSON(http.StatusOK, nil)
 }

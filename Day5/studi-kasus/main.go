@@ -2,6 +2,8 @@ package main
 
 import (
 	"fmt"
+	"mahasiswa/configs"
+	"mahasiswa/databases"
 	"mahasiswa/routes"
 
 	"github.com/gin-gonic/gin"
@@ -14,6 +16,13 @@ func main() {
 		}
 	}()
 
+	// koneksi ke db
+	configs.SetupMySQL()
+
+	// automigrate
+	databases.AutoMigrate()
+
+	// router
 	r := gin.Default()
 	routes.SetupRoutes(r)
 	r.Run()
