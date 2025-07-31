@@ -5,4 +5,5 @@
 - 16 Juli 2025 - [Sesi 3: Go sebagai Backend, HTTP Server, Routing & Struktur Project](https://github.com/syaifuladala/lnt-bncc-2025/tree/main/Day3)
 - 18 Juli 2025 - [Sesi 4: REST API Sederhana menggunakan slice of struct](https://github.com/syaifuladala/lnt-bncc-2025/tree/main/Day4)
 - 21 Juli 2025 - [Sesi 5: REST API CRUD dengan GORM](https://github.com/syaifuladala/lnt-bncc-2025/tree/main/Day5)
-- 21 Juli 2025 - [Sesi 6: Relasi Database dengan GORM](https://github.com/syaifuladala/lnt-bncc-2025/tree/main/Day6)
+- 24 Juli 2025 - [Sesi 6: Relasi Database dengan GORM](https://github.com/syaifuladala/lnt-bncc-2025/tree/main/Day6)
+- 28 Juli 2025 - [Sesi 6: Relasi Database dengan GORM](https://github.com/syaifuladala/lnt-bncc-2025/tree/main/Day7)
