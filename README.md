@@ -6,4 +6,5 @@
 - 18 Juli 2025 - [Sesi 4: REST API Sederhana menggunakan slice of struct](https://github.com/syaifuladala/lnt-bncc-2025/tree/main/Day4)
 - 21 Juli 2025 - [Sesi 5: REST API CRUD dengan GORM](https://github.com/syaifuladala/lnt-bncc-2025/tree/main/Day5)
 - 24 Juli 2025 - [Sesi 6: Relasi Database dengan GORM](https://github.com/syaifuladala/lnt-bncc-2025/tree/main/Day6)
-- 28 Juli 2025 - [Sesi 6: Relasi Database dengan GORM](https://github.com/syaifuladala/lnt-bncc-2025/tree/main/Day7)
+- 28 Juli 2025 - [Sesi 7: JSON Web Token (JWT)](https://github.com/syaifuladala/lnt-bncc-2025/tree/main/Day7)
+- 31 Juli 2025 - [Sesi 8: File Upload, Export Excel, dan Go Routine](https://github.com/syaifuladala/lnt-bncc-2025/tree/main/Day8)
