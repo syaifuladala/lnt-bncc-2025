@@ -2,7 +2,6 @@ package routes
 
 import (
 	"mahasiswa/handlers"
-	"mahasiswa/middlewares"
 
 	"github.com/gin-gonic/gin"
 )
@@ -15,7 +14,7 @@ func SetupRoutes(r *gin.Engine) {
 			authRoutes.POST("/login", handlers.Login)
 		}
 
-		mahasiswaRoutes := apiRoutes.Group("/mahasiswa", middlewares.AuthMiddleware())
+		mahasiswaRoutes := apiRoutes.Group("/mahasiswa") //, middlewares.AuthMiddleware())
 		{
 			mahasiswaRoutes.GET("/", handlers.ListMahasiswa)
 			mahasiswaRoutes.GET("/:id", handlers.GetMahasiswaByID)
@@ -23,6 +22,10 @@ func SetupRoutes(r *gin.Engine) {
 			mahasiswaRoutes.POST("/", handlers.CreateMahasiswa)
 			mahasiswaRoutes.PUT("/:id", handlers.UpdateMahasiswa)
 			mahasiswaRoutes.DELETE("/:id", handlers.DeleteMahasiswa)
+			mahasiswaRoutes.PATCH("/:id/photo", handlers.UpdatePhotoMahasiswa)
+			mahasiswaRoutes.GET("/view/:filename", handlers.ViewPhotoMahasiswa)
+			mahasiswaRoutes.GET("/download/:filename", handlers.DownloadPhotoMahasiswa)
+			mahasiswaRoutes.GET("/export", handlers.ExportMahasiswa)
 		}
 
 		dosenRoutes := apiRoutes.Group("/dosen")

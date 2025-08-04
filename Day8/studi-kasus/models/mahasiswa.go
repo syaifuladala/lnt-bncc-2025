@@ -15,4 +15,5 @@ type Mahasiswa struct {
 	RataRata float64          `json:"rata_rata"`
 	Lulus    bool             `json:"lulus" gorm:"default:0"`
 	Nilai    []NilaiMahasiswa `json:"nilai_mahasiswa" gorm:"foreignKey:MahasiswaID"`
+	Photo    *string          `json:"photo"`
 }
